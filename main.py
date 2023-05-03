@@ -3,9 +3,10 @@ import os
 
 from dotenv import load_dotenv
 
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher
 
 from bot.handlers.user_handlers import register_user_handlers
+from bot.database.alchemy.DDL import AllDDL
 
 
 def register_handler(dp: Dispatcher) -> None:
@@ -23,9 +24,16 @@ async def main() -> None:
     """
     load_dotenv(dotenv_path=".env")
     token = os.getenv(key="TELEGRAM_API_TOKEN")
+
     bot = Bot(token=token)
     dp = Dispatcher(bot=bot)
     register_handler(dp=dp)
+
+    sqlite_db_name = os.path.abspath(os.path.join("", "bot_sqlite_db"))
+    db = AllDDL(sqlite_db_name)
+    db.create_all_table()
+
+
     try:
         on_startup()
         await dp.start_polling()
