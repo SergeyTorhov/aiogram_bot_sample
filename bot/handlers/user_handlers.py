@@ -21,7 +21,7 @@ async def cmd_start(msg: types.Message) -> None:
     else:
         text = "Привет {}! Мы уже знакомы, последний раз ты заходил {}." \
             .format(msg.from_user.first_name,
-                    datetime.strftime(user_data.last_call, '%Y-%m-%d %H:%M:%S'))
+                    datetime.strftime(user_data[1], '%Y-%m-%d %H:%M:%S'))
         update_user_data(user_id=msg.from_user.id, last_call=datetime.now(), user_name=msg.from_user.username,
                          first_name=msg.from_user.first_name, last_name=msg.from_user.last_name)
 
