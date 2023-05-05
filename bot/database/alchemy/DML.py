@@ -1,48 +1,33 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import create_engine
-from sqlalchemy import String
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy import select
+from sqlalchemy.exc import NoResultFound
+from sqlalchemy import update
 
-from typing import Optional
-
-from bot.database.alchemy.DDL import AllDDL
+from bot.database.db_main import Database
+from bot.database.alchemy.DDL import User
 
 
-class AllDML:
-    """
-    Класс реализующий работу данными в БД
-    """
+def create_new_user(user_id, last_call, user_name, first_name, last_name):
+    try:
+        Database().session.query(User.user_id).filter(User.user_id == user_id).one()
+    except NoResultFound:
+        Database().session.add(User(user_id=user_id,
+                                    last_call=last_call,
+                                    user_name=user_name,
+                                    first_name=first_name,
+                                    last_name=last_name))
+        Database().session.commit()
 
-    def __init__(self, db_name: str):
-        self.db_name = db_name
-        self.engine = create_engine('sqlite:///{}'.format(self.db_name), echo=True)
 
-    def update_user_data(self, user_id, last_call, user_name, first_name, last_name):
-        with Session(self.engine) as session:
-            stmt = select(AllDDL.User).where(AllDDL.User.user_id.in_([user_id, ]))
-            my_user = session.scalars(stmt).one()
-            my_user.last_name = last_name
-            my_user.user_name = user_name
-            my_user.first_name = first_name
-            my_user.last_call = last_call
-            session.commit()
-
-    def find_user_by_id(self, user_id):
-        with Session(self.engine) as session:
-            stmt = select(AllDDL.User).where(AllDDL.User.user_id.in_([user_id, ]))
-            return session.scalars(stmt).first()
-
-    def insert_user_data(self, user_id, last_call, user_name, first_name, last_name):
-        with Session(self.engine) as session:
-            my_user_data = AllDDL.User(
-                user_id=user_id,
-                last_call=last_call,
-                user_name=user_name,
-                first_name=first_name,
-                last_name=last_name
+def update_user_data(user_id, last_call, user_name, first_name, last_name):
+    stmt = (update(User).
+            where(User.user_id.in_([user_id])).
+            values(last_call=last_call, user_name=user_name, first_name=first_name, last_name=last_name)
             )
-            session.add_all([my_user_data])
-            session.commit()
+    Database().session.execute(stmt)
+    Database().session.commit()
+
+
+def find_userdata_by_id(user_id):
+    try:
+        return Database().session.query(User.user_id, User.last_call).filter(User.user_id == user_id).one()
+    except NoResultFound:
+        return None
