@@ -1,14 +1,15 @@
 from sqlalchemy import String, Integer, DateTime, Column
 from datetime import datetime
+from typing import Optional
 
-from bot.database.db_main import Database
+from bot.data.db_main import Database
 
 
 class User(Database.BASE):
     """
     Класс реализующий таблицу user
     """
-    __tablename__ = "user"
+    __tablename__ = "user_table"
 
     user_id: int = Column(Integer, primary_key=True)
     last_call: datetime = Column(DateTime)
@@ -25,5 +26,9 @@ class User(Database.BASE):
         self.last_name = last_name
 
 
-def create_all_db_structure():
-    Database().BASE.metadata.create_all(Database().engine)
+def create_all_db_structure(db_user_name: Optional[str], db_user_password: Optional[str],
+                            db_address: Optional[str], db_name: Optional[str]):
+    Database(db_user_name=db_user_name, db_user_password=db_user_password,
+             db_address=db_address, db_name=db_name).BASE.metadata. \
+        create_all(Database(db_user_name=db_user_name, db_user_password=db_user_password,
+                            db_address=db_address, db_name=db_name).engine)

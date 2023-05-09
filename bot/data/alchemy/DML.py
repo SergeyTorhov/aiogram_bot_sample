@@ -1,8 +1,8 @@
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy import update
 
-from bot.database.db_main import Database
-from bot.database.alchemy.DDL import User
+from bot.data.db_main import Database
+from bot.data.alchemy.DDL import User
 
 from datetime import datetime
 from typing import Optional
