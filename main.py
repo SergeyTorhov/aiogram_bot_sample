@@ -13,14 +13,28 @@ from bot.data.alchemy.DML import insert_text_string
 
 
 def register_handler(dp: Dispatcher) -> None:
+    """
+    Register user handlers in the dispatcher object.
+    :param dp:
+    :return:
+    """
     register_user_handlers(dp=dp)
 
 
 def register_bot_middleware(dp: Dispatcher) -> None:
+    """
+    Registering the middleware in the dispatcher object.
+    :param dp:
+    :return:
+    """
     register_middleware(dp=dp)
 
 
 def db_text_string_insert() -> None:
+    """
+    Writing text variables to the database.
+    :return:
+    """
     # insert_text_string(string_name=, string_text=, string_type="handlers", string_language="RU")
     insert_text_string(string_name="MORE_INFO", string_text="MORE INFO", string_type="handlers", string_language="RU")
     insert_text_string(string_name="GET_MORE_INFO", string_text="Тут больше информации!", string_type="handlers",

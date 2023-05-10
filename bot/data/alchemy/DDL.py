@@ -48,6 +48,14 @@ class TextString(Database.BASE):
 
 def create_all_db_structure(db_user_name: Optional[str], db_user_password: Optional[str],
                             db_address: Optional[str], db_name: Optional[str]):
+    """
+    The function of creating tables in the database.
+    :param db_user_name:
+    :param db_user_password:
+    :param db_address:
+    :param db_name:
+    :return:
+    """
     Database(db_user_name=db_user_name, db_user_password=db_user_password,
              db_address=db_address, db_name=db_name).BASE.metadata. \
         create_all(Database(db_user_name=db_user_name, db_user_password=db_user_password,

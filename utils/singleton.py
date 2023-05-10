@@ -1,6 +1,6 @@
 class SingletonMeta(type):
     """
-    Класс реализующий возможность создания единственного экземпляра объекта.
+    A decorator that releases a single instance of any class.
     """
     _instance = None
 

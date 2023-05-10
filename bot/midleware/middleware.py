@@ -138,4 +138,9 @@ class ThrottlingMiddleware(BaseMiddleware):
 
 
 def register_middleware(dp: Dispatcher) -> None:
+    """
+    Registering the middleware in the dispatcher object.
+    :param dp:
+    :return:
+    """
     dp.setup_middleware(middleware=ThrottlingMiddleware())

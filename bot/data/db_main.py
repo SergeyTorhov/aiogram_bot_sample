@@ -10,6 +10,9 @@ from utils.singleton import SingletonMeta
 
 
 class Database(metaclass=SingletonMeta):
+    """
+    A class that implements work with the database. The only instance in the application.
+    """
     BASE: Final = declarative_base()
 
     # USE FOR SQLITE
@@ -33,8 +36,16 @@ class Database(metaclass=SingletonMeta):
 
     @property
     def session(self):
+        """
+        Getter for getting the current session.
+        :return:
+        """
         return self.__session
 
     @property
     def engine(self):
+        """
+        Getter for getting the current engine.
+        :return:
+        """
         return self.__engine

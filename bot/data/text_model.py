@@ -1,5 +1,4 @@
-#
-
+# Text variables, not used by default.
 MORE_INFO = "MORE INFO"
 GET_MORE_INFO = "Тут больше информации!"
 MSG_HI = "Привет {}!"

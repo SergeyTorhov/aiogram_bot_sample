@@ -5,7 +5,7 @@ from bot.data.text_model import MORE_INFO
 
 def get_main_keyboard() -> InlineKeyboardMarkup:
     """
-    Get keyboard for user main menu
+    Get keyboard for user main menu.
     :return:
     """
     ikb = InlineKeyboardMarkup(inline_keyboard=[

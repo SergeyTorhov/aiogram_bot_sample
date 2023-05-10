@@ -10,7 +10,7 @@ from bot.midleware.middleware import rate_limit
 @rate_limit(limit=60, key="start")
 async def cmd_start(msg: types.Message) -> None:
     """
-    Start message handler
+    Start message handler.
     :param msg:
     :return:
     """
@@ -32,6 +32,11 @@ async def cmd_start(msg: types.Message) -> None:
 
 @rate_limit(limit=15, key="cb_btn_more_info")
 async def ikb_more_info(cb: types.callback_query):
+    """
+    Callback handler
+    :param cb:
+    :return:
+    """
     if cb.data == "cb_btn_more_info":
         await cb.answer(find_text_string(string_name="GET_MORE_INFO"))
 
