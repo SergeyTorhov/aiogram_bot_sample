@@ -27,7 +27,7 @@ class Database(metaclass=SingletonMeta):
         # USE FOR SQLITE
         # self.__db_engine = 'sqlite:///{}'.format(Database.__db_path)
 
-        self.__engine = create_engine(self.__db_engine, echo=False)
+        self.__engine = create_engine(self.__db_engine, echo=True)
         session = sessionmaker(bind=self.__engine)
         self.__session = session()
 

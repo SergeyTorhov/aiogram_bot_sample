@@ -9,6 +9,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from bot.handlers.user_handlers import register_user_handlers
 from bot.midleware.middleware import register_middleware
 from bot.data.alchemy.DDL import create_all_db_structure
+from bot.data.alchemy.DML import insert_text_string
 
 
 def register_handler(dp: Dispatcher) -> None:
@@ -17,6 +18,17 @@ def register_handler(dp: Dispatcher) -> None:
 
 def register_bot_middleware(dp: Dispatcher) -> None:
     register_middleware(dp=dp)
+
+
+def db_text_string_insert() -> None:
+    # insert_text_string(string_name=, string_text=, string_type="handlers", string_language="RU")
+    insert_text_string(string_name="MORE_INFO", string_text="MORE INFO", string_type="handlers", string_language="RU")
+    insert_text_string(string_name="GET_MORE_INFO", string_text="Тут больше информации!", string_type="handlers",
+                       string_language="RU")
+    insert_text_string(string_name="MSG_HI", string_text="Привет {}!", string_type="handlers", string_language="RU")
+    insert_text_string(string_name="MSG_HI_AGAIN",
+                       string_text="Привет {}! Мы уже знакомы, последний раз ты заходил {}.", string_type="handlers",
+                       string_language="RU")
 
 
 async def main() -> None:
@@ -44,6 +56,7 @@ def on_startup() -> None:
                             db_user_password=os.getenv(key="DB_USER_PASSWORD"),
                             db_address=os.getenv(key="DB_ADDRESS"),
                             db_name=os.getenv(key="DB_NAME"))
+    db_text_string_insert()
     # create_all_db_structure(None, None, None, None)
     print("Bot starting...")
 
