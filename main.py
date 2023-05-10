@@ -1,6 +1,9 @@
 import asyncio
 import os
 
+import logging
+from logging.handlers import RotatingFileHandler
+
 from dotenv import load_dotenv
 
 from aiogram import Bot, Dispatcher
@@ -45,12 +48,33 @@ def db_text_string_insert() -> None:
                        string_language="RU")
 
 
+def create_rotating_log(path: str) -> None:
+    """
+    Log management function
+    :param path:
+    :return:
+    """
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    file_handler = RotatingFileHandler(filename=path, mode="w", maxBytes=10000000, backupCount=10)
+    file_handler.setFormatter(logging.Formatter(fmt='[%(asctime)s: %(levelname)s] %(message)s'))
+
+    logger.addHandler(file_handler)
+
+    logging.debug('DEBUG MESSAGE')
+    logging.info('INFO MESSAGE')
+    logging.warning('WARNING MESSAGE')
+    logging.error("ERROR MESSAGE")
+    logging.critical("CRITICAL MESSAGE")
+
+
 async def main() -> None:
     """
     Entry point
     :return:
     """
-    load_dotenv(dotenv_path=".env")
+
     token = os.getenv(key="TELEGRAM_API_TOKEN")
 
     bot = Bot(token=token)
@@ -59,21 +83,33 @@ async def main() -> None:
     register_bot_middleware(dp=dp)
 
     try:
-        on_startup()
         await dp.start_polling(reset_webhook=True)
-    except Exception as exc:
-        print("Exception: {}".format(exc))
-
-
-def on_startup() -> None:
-    create_all_db_structure(db_user_name=os.getenv(key="DB_USER_NAME"),
-                            db_user_password=os.getenv(key="DB_USER_PASSWORD"),
-                            db_address=os.getenv(key="DB_ADDRESS"),
-                            db_name=os.getenv(key="DB_NAME"))
-    db_text_string_insert()
-    # create_all_db_structure(None, None, None, None)
-    print("Bot starting...")
+    except Exception as _exc:
+        logging.exception(_exc)
+    finally:
+        await dp.storage.close()
+        await dp.storage.wait_closed()
+        await bot.session.close()
 
 
 if __name__ == "__main__":
-    asyncio.run(main=main())
+    try:
+        log_path = os.path.abspath(os.path.join("", "bot", "logs", "bot_logs.log"))
+        create_rotating_log(log_path)
+
+        load_dotenv(dotenv_path=".env")
+        create_all_db_structure(db_user_name=os.getenv(key="DB_USER_NAME"),
+                                db_user_password=os.getenv(key="DB_USER_PASSWORD"),
+                                db_address=os.getenv(key="DB_ADDRESS"),
+                                db_name=os.getenv(key="DB_NAME"))
+        # USE FOR SQLITE
+        # create_all_db_structure(None, None, None, None)
+        db_text_string_insert()
+    except Exception as exc:
+        logging.exception(exc)
+
+    try:
+        logging.warning(msg="BOT STARTED....")
+        asyncio.run(main=main())
+    except (KeyboardInterrupt, SystemExit):
+        logging.warning("BOT STOPPED...")

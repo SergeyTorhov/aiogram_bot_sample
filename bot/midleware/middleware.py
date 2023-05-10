@@ -1,4 +1,6 @@
 import asyncio
+import logging
+
 from aiogram import types, Dispatcher
 from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.utils.exceptions import Throttled
@@ -33,6 +35,7 @@ class ThrottlingMiddleware(BaseMiddleware):
 
         """
         This handler is called when dp receives a message
+        :param data:
         :param message:
         """
         # Get current handler
@@ -46,13 +49,14 @@ class ThrottlingMiddleware(BaseMiddleware):
         else:
             limit = self.rate_limit
             key = f"{self.prefix}_message"
-        print(f"Limit: {limit}, key: {key}")
+        # print(f"Limit: {limit}, key: {key}")
         # Use Dispatcher.throttle method.
         try:
             await dp.throttle(key, rate=limit)
         except Throttled as t:
             # Execute action
-            print(f"T: {t}")
+            logging.info(msg="Users message from userid: {} throttled. {}".format(message.from_user.id,
+                                                                                  t))
             await self.message_throttled(message, t)
             # Cancel current handler
             raise CancelHandler()
@@ -60,6 +64,7 @@ class ThrottlingMiddleware(BaseMiddleware):
     async def on_process_callback_query(self, cb: types.CallbackQuery, data: dict):
         """
         This handler is called when dp receives a callback query
+        :param data:
         :param cb:
         """
         # Get current handler
@@ -79,7 +84,8 @@ class ThrottlingMiddleware(BaseMiddleware):
             await dp.throttle(key, rate=limit)
         except Throttled as t:
             # Execute action
-            print(f"T: {t}")
+            logging.info(msg="Users callback query from userid: {} throttled. {}".format(cb.from_user.id,
+                                                                                         t))
             await self.cb_throttled(cb, throttled=t)
             # Cancel current handler
             raise CancelHandler()
@@ -96,8 +102,7 @@ class ThrottlingMiddleware(BaseMiddleware):
             key = getattr(handler, 'throttling_key', f"{self.prefix}_{handler.__name__}")
         else:
             key = f"{self.prefix}_message"
-        print(f"KEY: {key}")
-        # Calculate how many time is left till the block ends
+        # Calculate how much time is left until the end of the block
         delta = throttled.rate - throttled.delta
         # Prevent flooding
         if throttled.exceeded_count <= 2:
@@ -122,8 +127,7 @@ class ThrottlingMiddleware(BaseMiddleware):
             key = getattr(handler, 'throttling_key', f"{self.prefix}_{handler.__name__}")
         else:
             key = f"{self.prefix}_message"
-        print(f"KEY: {key}")
-        # Calculate how many time is left till the block ends
+        # Calculate how much time is left until the end of the block
         delta = throttled.rate - throttled.delta
         # Prevent flooding
         if throttled.exceeded_count <= 2:

@@ -7,6 +7,28 @@ from bot.data.alchemy.DDL import User, TextString
 from datetime import datetime
 from typing import Optional
 
+import logging
+
+
+def insert_text_string(string_name: str, string_text: str, string_type: str, string_language: str) -> None:
+    """
+    Writing text variables to the database.
+    :param string_name:
+    :param string_text:
+    :param string_type:
+    :param string_language:
+    :return:
+    """
+    try:
+        Database(None, None, None, None).session.add(TextString(string_name=string_name,
+                                                                string_text=string_text,
+                                                                string_type=string_type,
+                                                                string_language=string_language))
+        Database(None, None, None, None).session.commit()
+    except Exception as exc:
+        logging.debug(exc)
+        Database(None, None, None, None).session.rollback()
+
 
 def find_text_string(string_name: str) -> Optional[str]:
     """
@@ -15,9 +37,11 @@ def find_text_string(string_name: str) -> Optional[str]:
     :return:
     """
     try:
-        return Database().session.query(TextString.string_text).filter(TextString.string_name == string_name).one()[0]
+        return Database(None, None, None, None).session.query(TextString.string_text).filter(TextString.string_name
+                                                                                             == string_name).one()[0]
     except NoResultFound:
-        return None
+        logging.exception(msg="TEXT NOT FOUND")
+        return "Text not found!"
 
 
 def create_new_user(user_id: int, last_call: datetime, user_name: str,
@@ -32,15 +56,15 @@ def create_new_user(user_id: int, last_call: datetime, user_name: str,
     :return:
     """
     try:
-        Database().session.add(User(user_id=user_id,
-                                    last_call=last_call,
-                                    user_name=user_name,
-                                    first_name=first_name,
-                                    last_name=last_name))
-        Database().session.commit()
+        Database(None, None, None, None).session.add(User(user_id=user_id,
+                                                          last_call=last_call,
+                                                          user_name=user_name,
+                                                          first_name=first_name,
+                                                          last_name=last_name))
+        Database(None, None, None, None).session.commit()
     except Exception as exc:
-        print(exc)
-        Database().session.rollback()
+        logging.exception(exc)
+        Database(None, None, None, None).session.rollback()
 
 
 def update_user_data(user_id, last_call, user_name, first_name, last_name) -> None:
@@ -53,12 +77,16 @@ def update_user_data(user_id, last_call, user_name, first_name, last_name) -> No
     :param last_name:
     :return:
     """
-    stmt = (update(User).
-            filter(User.user_id == user_id).
-            values(last_call=last_call, user_name=user_name, first_name=first_name, last_name=last_name)
-            )
-    Database().session.execute(stmt)
-    Database().session.commit()
+    try:
+        stmt = (update(User).
+                filter(User.user_id == user_id).
+                values(last_call=last_call, user_name=user_name, first_name=first_name, last_name=last_name)
+                )
+        Database(None, None, None, None).session.execute(stmt)
+        Database(None, None, None, None).session.commit()
+    except Exception as exc:
+        logging.info(exc)
+        Database(None, None, None, None).session.rollback()
 
 
 def find_userdata_by_id(user_id: int) -> Optional[tuple[int, datetime]]:
@@ -68,26 +96,8 @@ def find_userdata_by_id(user_id: int) -> Optional[tuple[int, datetime]]:
     :return:
     """
     try:
-        return Database().session.query(User.user_id, User.last_call).filter(User.user_id == user_id).one()
+        return Database(None, None, None, None).session.query(User.user_id, User.last_call).filter(User.user_id
+                                                                                                   == user_id).one()
     except NoResultFound:
+        logging.info("NO USER DATA IN DB")
         return None
-
-
-def insert_text_string(string_name: str, string_text: str, string_type: str, string_language: str) -> None:
-    """
-    Writing text variables to the database.
-    :param string_name:
-    :param string_text:
-    :param string_type:
-    :param string_language:
-    :return:
-    """
-    try:
-        Database().session.add(TextString(string_name=string_name,
-                                          string_text=string_text,
-                                          string_type=string_type,
-                                          string_language=string_language))
-        Database().session.commit()
-    except Exception as exc:
-        print(exc)
-        Database().session.rollback()

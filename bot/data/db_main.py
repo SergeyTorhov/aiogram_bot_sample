@@ -1,6 +1,7 @@
 from typing import Final
 from typing import Optional
-from os import path
+# USE FOR SQLITE
+# from os import path
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -30,7 +31,7 @@ class Database(metaclass=SingletonMeta):
         # USE FOR SQLITE
         # self.__db_engine = 'sqlite:///{}'.format(Database.__db_path)
 
-        self.__engine = create_engine(self.__db_engine, echo=True)
+        self.__engine = create_engine(self.__db_engine, echo=False)
         session = sessionmaker(bind=self.__engine)
         self.__session = session()
 
