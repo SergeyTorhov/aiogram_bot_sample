@@ -31,7 +31,7 @@ class Database(metaclass=SingletonMeta):
                                                                      db_name)
 
         # USE FOR SQLITE
-        # self.__db_engine = 'sqlite:///{}'.format(Database.__db_path)
+        # self.__db_engine = 'sqlite+aiosqlite:///{}'.format(Database.__db_path)
 
         self.__engine = create_async_engine(self.__db_engine, echo=True)
         async_session = async_sessionmaker(bind=self.__engine)
