@@ -1,11 +1,13 @@
 from typing import Final
 from typing import Optional
+import asyncio
 # USE FOR SQLITE
 # from os import path
 
-from sqlalchemy import create_engine
+
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from utils.singleton import SingletonMeta
 
@@ -23,17 +25,17 @@ class Database(metaclass=SingletonMeta):
     def __init__(self, db_user_name: Optional[str], db_user_password: Optional[str],
                  db_address: Optional[str], db_name: Optional[str]):
         # USE FOR POSTGRESQL
-        self.__db_engine = "postgresql+psycopg2://{}:{}@{}/{}".format(db_user_name,
-                                                                      db_user_password,
-                                                                      db_address,
-                                                                      db_name)
+        self.__db_engine = "postgresql+asyncpg://{}:{}@{}/{}".format(db_user_name,
+                                                                     db_user_password,
+                                                                     db_address,
+                                                                     db_name)
 
         # USE FOR SQLITE
         # self.__db_engine = 'sqlite:///{}'.format(Database.__db_path)
 
-        self.__engine = create_engine(self.__db_engine, echo=False)
-        session = sessionmaker(bind=self.__engine)
-        self.__session = session()
+        self.__engine = create_async_engine(self.__db_engine, echo=True)
+        async_session = async_sessionmaker(bind=self.__engine)
+        self.__session = async_session()
 
     @property
     def session(self):

@@ -11,41 +11,44 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 from bot.handlers.user_handlers import register_user_handlers
 from bot.midleware.middleware import register_middleware
-from bot.data.alchemy.DDL import create_all_db_structure
+from bot.data.alchemy.DDL import init_models
 from bot.data.alchemy.DML import insert_text_string
 
 
-def register_handler(dp: Dispatcher) -> None:
+async def register_handler(dp: Dispatcher) -> None:
     """
     Register user handlers in the dispatcher object.
     :param dp:
     :return:
     """
-    register_user_handlers(dp=dp)
+    await register_user_handlers(dp=dp)
 
 
-def register_bot_middleware(dp: Dispatcher) -> None:
+async def register_bot_middleware(dp: Dispatcher) -> None:
     """
     Registering the middleware in the dispatcher object.
     :param dp:
     :return:
     """
-    register_middleware(dp=dp)
+    await register_middleware(dp=dp)
 
 
-def db_text_string_insert() -> None:
+async def db_text_string_insert() -> None:
     """
     Writing text variables to the database.
     :return:
     """
     # insert_text_string(string_name=, string_text=, string_type="handlers", string_language="RU")
-    insert_text_string(string_name="MORE_INFO", string_text="MORE INFO", string_type="handlers", string_language="RU")
-    insert_text_string(string_name="GET_MORE_INFO", string_text="Тут больше информации!", string_type="handlers",
-                       string_language="RU")
-    insert_text_string(string_name="MSG_HI", string_text="Привет {}!", string_type="handlers", string_language="RU")
-    insert_text_string(string_name="MSG_HI_AGAIN",
-                       string_text="Привет {}! Мы уже знакомы, последний раз ты заходил {}.", string_type="handlers",
-                       string_language="RU")
+    await insert_text_string(string_name="MORE_INFO", string_text="MORE INFO", string_type="handlers",
+                             string_language="RU")
+    await insert_text_string(string_name="GET_MORE_INFO", string_text="Тут больше информации!", string_type="handlers",
+                             string_language="RU")
+    await insert_text_string(string_name="MSG_HI", string_text="Привет {}!", string_type="handlers",
+                             string_language="RU")
+    await insert_text_string(string_name="MSG_HI_AGAIN",
+                             string_text="Привет {}! Мы уже знакомы, последний раз ты заходил {}.",
+                             string_type="handlers",
+                             string_language="RU")
 
 
 def create_rotating_log(path: str) -> None:
@@ -79,8 +82,18 @@ async def main() -> None:
 
     bot = Bot(token=token)
     dp = Dispatcher(bot=bot, storage=MemoryStorage())
-    register_handler(dp=dp)
-    register_bot_middleware(dp=dp)
+    await register_handler(dp=dp)
+    await register_bot_middleware(dp=dp)
+
+    await init_models(db_user_name=os.getenv(key="DB_USER_NAME"),
+                      db_user_password=os.getenv(key="DB_USER_PASSWORD"),
+                      db_address=os.getenv(key="DB_ADDRESS"),
+                      db_name=os.getenv(key="DB_NAME"))
+
+    await db_text_string_insert()
+    # USE FOR SQLITE
+    # create_all_db_structure(None, None, None, None)
+    # await db_text_string_insert()
 
     try:
         await dp.start_polling(reset_webhook=True)
@@ -98,13 +111,7 @@ if __name__ == "__main__":
         create_rotating_log(log_path)
 
         load_dotenv(dotenv_path=".env")
-        create_all_db_structure(db_user_name=os.getenv(key="DB_USER_NAME"),
-                                db_user_password=os.getenv(key="DB_USER_PASSWORD"),
-                                db_address=os.getenv(key="DB_ADDRESS"),
-                                db_name=os.getenv(key="DB_NAME"))
-        # USE FOR SQLITE
-        # create_all_db_structure(None, None, None, None)
-        db_text_string_insert()
+
     except Exception as exc:
         logging.exception(exc)
 

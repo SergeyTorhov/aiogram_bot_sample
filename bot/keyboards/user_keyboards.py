@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from bot.data.text_model import MORE_INFO
 
 
-def get_main_keyboard() -> InlineKeyboardMarkup:
+async def get_main_keyboard() -> InlineKeyboardMarkup:
     """
     Get keyboard for user main menu.
     :return:

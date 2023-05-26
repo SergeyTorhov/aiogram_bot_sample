@@ -141,7 +141,7 @@ class ThrottlingMiddleware(BaseMiddleware):
             await message.reply('Unlocked.')
 
 
-def register_middleware(dp: Dispatcher) -> None:
+async def register_middleware(dp: Dispatcher) -> None:
     """
     Registering the middleware in the dispatcher object.
     :param dp:
